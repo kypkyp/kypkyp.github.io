@@ -33,6 +33,7 @@ document.getElementById('answerSubmitButton').addEventListener("click", (e) => {
 		f.classList.add("answer_is_incorrect");
 		f.classList.remove("answer_is_correct");
 		realNo = 1;
+		canvas.height = height;
 	}
 
 	realNo += parseInt(Math.random() * (realNo + 1));
