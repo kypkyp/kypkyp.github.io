@@ -32,6 +32,7 @@ document.getElementById('answerSubmitButton').addEventListener("click", (e) => {
 		f.textContent = "錯和...";
 		f.classList.add("answer_is_incorrect");
 		f.classList.remove("answer_is_correct");
+		realNo = 1;
 	}
 
 	realNo += parseInt(Math.random() * (realNo + 1));
