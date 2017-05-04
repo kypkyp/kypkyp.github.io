@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Pinzu Counter</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="container">
+          <h1>Pinzu Counter</h1>
+          <div>Don't Chombo.</div>
+          <div class="row">
+              <div class="col-sm-6" id="canvasContainer">
+                  <canvas id="canvasHai" width=160" height="200"></canvas>
+              </div>
+              <div class="col-sm-6">
+                  <form name="answerForm" id="af">
+                      これは<input type="text" name="answerNumText" size="5em"></input>
+                      <button id="answerSubmitButton">ピン！</button>
+                  </form>
+                  <div id="feedback"></div>
+                  <p>現在のハイスコア…<span id="highscore">0</span></p>
+                  <div style="font-size:small;">（注意：更新すると消えるよ！）</div>
+                　</div>
+              </div>
+          </div>
+      </div>
+      <script src="pinzu.js"></script>
+<a href="https://twitter.com/share" class="twitter-share-button" data-text="Pinzu Counter で %d 点を取ったよ！（スコアツイート機能は実装する時間がなかったので雰囲気だけ察してくれ）" data-via="_kypu">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+  </body>
+</html>
