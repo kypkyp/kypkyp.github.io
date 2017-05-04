@@ -73,8 +73,8 @@ let drawHai = (realNo) => {
 	if(realNo === 1){
 		drawSoreppoiCircle(width / 2, height / 2, 50, "#355", "#a45", "#448");
 	}else if (realNo === 2) {
-		drawSoreppoiCircle(width / 2, height / 3.5, 40, "#355", "#a45", "#eee");
-		drawSoreppoiCircle(width / 2, height / 3.5 * 2.5, 40, "#355", "#a45", "#eee");
+		drawSoreppoiCircle(width / 2, height / 3.5, 40, "#355", "#a45", "#448");
+		drawSoreppoiCircle(width / 2, height / 3.5 * 2.5, 40, "#355", "#a45", "#448");
 	}else if(realNo === 3) {
 		drawSoreppoiCircle(width / 3, height / 4, 30, "#355", "#caf", "#448");
 		drawSoreppoiCircle(width / 2, height / 2, 30, "#a46", "#fac", "#448");
