@@ -36,7 +36,7 @@ document.getElementById('answerSubmitButton').addEventListener("click", (e) => {
 		canvas.height = height;
 	}
 
-	realNo += parseInt(Math.random() * (realNo + 1));
+	realNo += parseInt(Math.random() * realNo + 1);
 	drawHai(realNo);
 	document.answerForm.answerNumText.value = "";
 	document.getElementById('highscore').textContent = highScore;
