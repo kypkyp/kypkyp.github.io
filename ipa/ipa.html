@@ -1,0 +1,613 @@
+﻿<html>
+
+<script src="https://unpkg.com/vue"></script>
+<h1>発音記号エディタ～～～～</h1>
+<p>
+    調音位置や方法から記号を入力できます。超分節音など、性質上対応付けの難しい記号は現在未対応です(どうしよう)。
+</p>
+
+<div id="app">
+    <div style="border:0.5px #000 solid; height:1.5em;">{{ output }}</div>
+    <button @click="copy">Copy</button>
+    <button @click="clear">Clear</button>
+</div>
+
+<h3>つかいかた</h3>
+<p>下表を参考にして、最初に地が水色の項を、次に紅色の項を入力してください。<br>例えばあなたが/ʃ/を入力したいなら、キーボード(t)->(z)と入力します。<br>母音の場合も同様です。また、無効な入力（例えば(])->(f), 無声声門はじき音など）は無視されます。</p>
+<a href="https://gyazo.com/26017121ec8588b5093977260dabba2f"><img src="https://i.gyazo.com/26017121ec8588b5093977260dabba2f.png" alt="https://gyazo.com/26017121ec8588b5093977260dabba2f" width="1000px"/></a>
+
+<script>
+const INPUT_MODE = {
+    NEUTRAL: 0,
+    CONSONANT: 1,
+    VOWEL: 2,
+    OTHERS: 3
+};
+
+const CONSONANT = {
+    PLACE: {
+        BILABIAL: 'q',
+        LABIODENTAL: 'w',
+        DENTAL: 'e',
+        ALVEOLAR: 'r',
+        POSTALVEOLAR: 't',
+        RETROFLEX: 'y',
+        PALATAL: 'u',
+        VELAR: 'i',
+        UVULAR: 'o',
+        PHARYNGEAL: 'p',
+        EPIGLOTTAL: '@',
+        GLOTTAL: '['
+    },
+    MANNER: {
+        PLOSIVE_VOICELESS: 'a',
+        PLOSIVE_VOICED: 'z',
+        NASAL: 's',
+        TRILL: 'd',
+        TAP: 'f',
+        FRICATIVE_VOICELESS: 'g',
+        FRICATIVE_VOICED: 'b',
+        LATERAL_FRICATIVE_VOICELESS: 'h',
+        LATERAL_FRICATIVE_VOICED: 'j',
+        APPROXIMANT: 'k',
+        LATERAL_APPROXIMANT: 'l',
+        CLICKS: ';',
+        VOICED_IMPLOSIVES: ':',
+        EJECTIVE: ']'
+    }
+};
+
+const VOWEL = {
+    HEIGHT: {
+        HIGH: 'a',
+        NEAR_HIGH: 's',
+        HIGH_MID: 'd',
+        MID: 'f',
+        LOW_MID: 'g',
+        NEAR_LOW: 'h',
+        LOW: 'j'
+    },
+    BACKNESS: {
+        FRONT_UNROUND: 'a',
+        FRONT_ROUND: 'z',
+        CENTRAL_UNROUND: 's',
+        CENTRAL_ROUND: 'x',
+        BACK_UNROUND: 'd',
+        BACK_ROUND: 'c'
+    }
+};
+
+let data = {
+    output: "",
+    input: {
+        stage: 0,
+        array: [],
+        mode: INPUT_MODE.NEUTRAL
+    }
+};
+
+v = new Vue({
+    el: '#app',
+    data: data,
+    methods:{
+        copy: function(){
+                execCopy(this.output);
+            },
+        clear: function(){
+                this.output = "";
+            }
+    }
+});
+
+let keyDown = (e) => {
+    key = e.key;
+    if(key == "Escape"){
+        data.input.stage = 0;
+        return;
+    }
+    if(data.input.stage > 0){
+        switch(data.input.mode){
+            case INPUT_MODE.NEUTRAL:
+                break;
+            case INPUT_MODE.CONSONANT:
+                inputConsonant(e.key);
+                break;
+            case INPUT_MODE.VOWEL:
+                inputVowel(e.key);
+                break;
+        }
+        return;
+    }
+    if(data.input.stage == 0){
+        initialInput(e.key);
+        return;
+    }
+
+    data.output = key;
+}
+
+let initialInput = (c) => {
+    data.input.array.push(c);
+    for(let k in CONSONANT.PLACE){
+        if(c == CONSONANT.PLACE[k]){
+            data.input.mode = INPUT_MODE.CONSONANT;
+            break;
+        }
+    }
+    for(let k in VOWEL.HEIGHT){
+        if(c == VOWEL.HEIGHT[k]){
+            data.input.mode = INPUT_MODE.VOWEL;
+            break;
+        }
+    }
+    data.input.stage++;
+};
+
+/* どうにかしたい　*/
+let inputConsonant = (c) => {
+    switch(c){
+        case CONSONANT.MANNER.PLOSIVE_VOICELESS:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "p";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "p̪";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "t";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ʈ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "c";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "k";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "q";
+                    break;
+                case CONSONANT.PLACE.EPIGLOTTAL:
+                    data.output += "ʡ";
+                    break;
+                case CONSONANT.PLACE.GLOTTAL:
+                    data.output += "ʔ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.PLOSIVE_VOICED:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "b";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "b̪";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "d";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ɖ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ɟ";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "g";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "ɢ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.NASAL:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "m";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "ɱ";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "n";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ɳ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ŋ";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "ɴ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.TRILL:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "ʙ";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "r";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "ʀ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.TAP:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "ⱱ̟";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "ⱱ";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "ɾ";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ɽ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ɟ̆";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "ɢ̆";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.FRICATIVE_VOICELESS:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "ɸ";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "f";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                    data.output += "θ";
+                    break;
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                    data.output += "ʃ";
+                    break;
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "s";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ʂ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ç";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "x";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "χ";
+                    break;
+                case CONSONANT.PLACE.PHARYNGEAL:
+                    data.output += "ħ";
+                    break;
+                case CONSONANT.PLACE.EPIGLOTTAL:
+                    data.output += "ʜ";
+                    break;
+                case CONSONANT.PLACE.GLOTTAL:
+                    data.output += "h";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.FRICATIVE_VOICED:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "β";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "v";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                    data.output += "ð";
+                    break;
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                    data.output += "ʒ";
+                    break;
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "z";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ʐ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ʝ";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "ɣ";
+                    break;
+                case CONSONANT.PLACE.UVULAR:
+                    data.output += "ʁ";
+                    break;
+                case CONSONANT.PLACE.PHARYNGEAL:
+                    data.output += "ʕ";
+                    break;
+                case CONSONANT.PLACE.EPIGLOTTAL:
+                    data.output += "ʢ";
+                    break;
+                case CONSONANT.PLACE.GLOTTAL:
+                    data.output += "ɦ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.LATERAL_FRICATIVE_VOICELESS:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "ɬ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.LATERAL_FRICATIVE_VOICED:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.DENTAL:
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "ɮ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.APPROXIMANT:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "β̞";
+                    break;
+                case CONSONANT.PLACE.LABIODENTAL:
+                    data.output += "ʋ";
+                    break;
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                case CONSONANT.PLACE.DENTAL:
+                    data.output += "ɹ"
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ɻ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "j";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "ɰ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.LATERAL_APPROXIMANT:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                case CONSONANT.PLACE.ALVEOLAR:
+                case CONSONANT.PLACE.DENTAL:
+                    data.output += "l";
+                    break;
+                case CONSONANT.PLACE.RETROFLEX:
+                    data.output += "ɭ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ʎ";
+                    break;
+                case CONSONANT.PLACE.VELAR:
+                    data.output += "ʟ";
+                    break;
+            }
+            break;
+        case CONSONANT.MANNER.CLICK:
+            switch(data.input.array[0]){
+                case CONSONANT.PLACE.BILABIAL:
+                    data.output += "ʘ";
+                    break;
+                case CONSONANT.PLACE.ALVEOLAR:
+                    data.output += "ǃ";
+                    break;
+                case CONSONANT.PLACE.POSTALVEOLAR:
+                    data.output += "ǁ";
+                    break;
+                case CONSONANT.PLACE.DENTAL:
+                    data.output += "ǀ";
+                    break;
+                case CONSONANT.PLACE.PALATAL:
+                    data.output += "ǂ";
+                    break;
+            }
+            break;
+    }
+
+    data.input.array = [];
+    data.input.stage = 0;
+}
+
+let inputVowel = (c) => {
+    switch(c){
+        case VOWEL.BACKNESS.FRONT_UNROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "i";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ɪ";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "e";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "e̞";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "ɛ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_LOW:
+                    data.output += "æ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "a";
+                    break;
+            }
+            break;
+        case VOWEL.BACKNESS.FRONT_ROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "y";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ʏ";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "ø";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "ø̞";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "œ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_LOW:
+                    data.output += "æ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "ɶ";
+                    break;
+            }
+            break;
+        case VOWEL.BACKNESS.CENTRAL_UNROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "ɨ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ɪ̈";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "ɘ";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "ə";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "ɜ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_LOW:
+                    data.output += "ɐ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "ä";
+                    break;
+            }
+            break;
+        case VOWEL.BACKNESS.CENTRAL_ROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "ʉ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ʊ̈";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "ɵ";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "ə";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "ɞ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_LOW:
+                    data.output += "ɐ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "ä";
+                    break;
+            }
+            break;
+        case VOWEL.BACKNESS.BACK_UNROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "ɯ";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ɯ̽";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "ɤ";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "ɤ̞";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "ʌ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "ɑ";
+                    break;
+            }
+            break;
+        case VOWEL.BACKNESS.BACK_UNROUND:
+            switch(data.input.array[0]){
+                case VOWEL.HEIGHT.HIGH:
+                    data.output += "u";
+                    break;
+                case VOWEL.HEIGHT.NEAR_HIGH:
+                    data.output += "ʊ";
+                    break;
+                case VOWEL.HEIGHT.HIGH_MID:
+                    data.output += "o";
+                    break;
+                case VOWEL.HEIGHT.MID:
+                    data.output += "o̞";
+                    break;
+                case VOWEL.HEIGHT.LOW_MID:
+                    data.output += "ɔ";
+                    break;
+                case VOWEL.HEIGHT.LOW:
+                    data.output += "ɒ";
+                    break;
+            }
+            break;
+    }
+
+    data.input.array = [];
+    data.input.stage = 0;
+}
+
+/* コピペ あとでどうにかする */
+function execCopy(string){
+  var temp = document.createElement('div');
+
+  temp.appendChild(document.createElement('pre')).textContent = string;
+
+  var s = temp.style;
+  s.position = 'fixed';
+  s.left = '-100%';
+
+  document.body.appendChild(temp);
+  document.getSelection().selectAllChildren(temp);
+
+  var result = document.execCommand('copy');
+
+  document.body.removeChild(temp);
+  // true なら実行できている falseなら失敗か対応していないか
+  return result;
+}
+
+document.addEventListener("keydown", keyDown);
+
+</script>
+
+</html>
