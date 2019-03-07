@@ -1,8 +1,73 @@
-$MAIN_BGCOLOR: #ffaa55;
-$MAIN_FONTCOLOR: #fff;
+$MAIN_COLOR: #ffaa55;
+$SECONDARY_COLOR: #eeeeaa;
+$MAIN_TEXTCOLOR: #4c3319;
+
+body, h1, h2, h3, h4, div, p, ul, li{
+    padding: 0;
+    margin: 0;
+}
 
 body{
-    background-color: $MAIN_BGCOLOR;
+    background-color: $MAIN_COLOR;
     color: #fff;
     font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+h1{
+    padding-top: 60px;
+    text-align: center;
+    margin: 0 auto;
+    font-weight: 700;
+    padding-bottom: 20px;
+}
+
+.head_container {
+    background-color: $MAIN_COLOR;
+    width: 100%;
+    height: 800px;
+}
+
+.head {
+    background-color: white;
+    color: $MAIN_TEXTCOLOR;
+    float: right;
+    width: 500px;
+    padding: 3px 3px 3px 3px;
+    margin-right: 10px;
+    ul{
+        list-style: none;
+    }
+    li{
+        padding-left: 5px;
+        padding-bottom: 5px;
+    }
+}
+
+.snsicons{
+    a{
+        color: white;
+        text-decoration: none;
+    }
+    text-align: center;
+    font-size: large;
+    margin: 0 auto 10px auto;
+    border-bottom: 1px solid #fff;
+    padding: 3px 5px 5px;
+    width: 220px;
+    margin-bottom: 20px;
+}
+
+.hiddenlist {
+    color: #fff6ee;
+}
+
+.middle{
+    background-color: $SECONDARY_COLOR;
+    height: 800px;
+    width: 100%;
+}
+
+.middle_container{
+    background-color: #fff;
+    color:$SECONDARY_COLOR;
 }
